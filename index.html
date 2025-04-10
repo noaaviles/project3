@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Moves - Your Daily Dance Expression</title>
+    <style>
+        /* Basic styles for the page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            color: #6c5ce7;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #636e72;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .daily-tracker {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .daily-tracker p {
+            margin-bottom: 10px;
+            color: #636e72;
+        }
+
+        .streak-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6c5ce7;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .emotions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            margin: 40px 0;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .emotion-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .emotion-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Different colors for the buttons */
+        .happy {
+            background-color: #ff9f00;
+        }
+
+        .sad {
+            background-color: #0984e3;
+        }
+
+        .energetic {
+            background-color: #e84393;
+        }
+
+        .calm {
+            background-color: #00b894;
+        }
+
+        .confused {
+            background-color: #d63031;
+        }
+
+        .angry {
+            background-color: #fdcb6e;
+        }
+
+        .surprise-btn {
+            margin: 30px auto;
+            display: block;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            background-color: #e84393;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(232, 67, 147, 0.3);
+        }
+
+        .surprise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(232, 67, 147, 0.4);
+        }
+
+        /* Styling for the camera and GIF overlay */
+        #videoElement {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .gif-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://media3.giphy.com/media/UQInGU1DfKKMbw9Iq9/giphy.gif?cid=6c09b952tvg882eeg94kqhpfimk90g1czjzz9ne9ne5drq77&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g') no-repeat center center;
+            background-size: contain;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(30px);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center; /* Ensures text is centered */
+        }
+
+        #videoContainer {
+            position: relative;
+            display: flex;
+            justify-content: center; /* Centers the video container */
+            align-items: center;
+            width: 100%;
+            max-width: 500px; /* Prevents video from stretching too wide */
+            margin-bottom: 20px; /* Adds space below the video */
+        }
+
+        .dance-move-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .description {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #636e72;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .dance-move-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6c5ce7;
+            margin-bottom: 15px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #636e72;
+        }
+
+        .complete-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background-color: #00b894;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .complete-btn:hover {
+            background-color: #00a381;
+            transform: scale(1.05);
+        }
+
+        .disabled-btn {
+            background-color: #b2bec3;
+            cursor: not-allowed;
+        }
+
+        .disabled-btn:hover {
+            background-color: #b2bec3;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mood Moves</h1>
+        <p class="subtitle">Express how you're feeling through one dance every day! Choose your emotion and keep your streak going!</p>
+    </header>
+
+    <div class="daily-tracker">
+        <p>Your dance streak</p>
+        <div class="streak-count">0 days</div>
+        <p id="lastDance">You haven't danced yet today. Express yourself!</p>
+    </div>
+
+    <div class="container">
+        <div class="emotions-grid">
+            <button class="emotion-btn happy">Happy</button>
+            <button class="emotion-btn sad">Sad</button>
+            <button class="emotion-btn energetic">Energetic</button>
+            <button class="emotion-btn calm">Calm</button>
+            <button class="emotion-btn confused">Confused</button>
+            <button class="emotion-btn angry">Angry</button>
+        </div>
+
+        <button id="surpriseBtn" class="surprise-btn">Surprise Me!</button>
+    </div>
+
+    <div id="danceModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn">&times;</button>
+            <div class="dance-move-container">
+                <h2 class="dance-move-title">The Sprinkler</h2>
+                <div id="videoContainer" style="position: relative;">
+                    <video id="videoElement" autoplay playsinline></video>
+                    <div class="gif-overlay"></div>
+                </div>
+                <p class="description">Watch the video and follow along with the dance moves! Can you keep up with the rhythm?</p>
+                <p>The Sprinkler is a classic dance move that mimics the back-and-forth motion of a lawn sprinkler. It's often used as a humorous dance move and is perfect for expressing playful joy or breaking the ice at parties!</p>
+                <button id="completeBtn" class="complete-btn">Mark Today's Dance Complete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Access the camera and display the video
+        const videoElement = document.getElementById('videoElement');
+        const surpriseBtn = document.getElementById('surpriseBtn');
+        const danceModal = document.getElementById('danceModal');
+        const closeBtn = document.querySelector('.close-btn');
+        const completeBtn = document.getElementById('completeBtn');
+        const emotionBtns = document.querySelectorAll('.emotion-btn');
+        const streakCount = document.querySelector('.streak-count');
+        const lastDanceText = document.getElementById('lastDance');
+
+        // Initialize dance streak from localStorage
+        let streak = localStorage.getItem('danceStreak') ? parseInt(localStorage.getItem('danceStreak')) : 0;
+        let lastDanceDate = localStorage.getItem('lastDanceDate');
+        let dancedToday = false;
+
+        // Check if user has danced today
+        function checkDancedToday() {
+            const today = new Date().toDateString();
+            if (lastDanceDate === today) {
+                dancedToday = true;
+                lastDanceText.textContent = "You've already completed your dance for today!";
+                completeBtn.classList.add('disabled-btn');
+                completeBtn.textContent = "Already Completed Today";
+            } else {
+                dancedToday = false;
+                lastDanceText.textContent = "You haven't danced yet today. Express yourself!";
+                completeBtn.classList.remove('disabled-btn');
+                completeBtn.textContent = "Mark Today's Dance Complete";
+            }
+            
+            // Update the streak display
+            streakCount.textContent = streak + " day" + (streak !== 1 ? "s" : "");
+        }
+
+        // Initialize the page
+        function init() {
+            checkDancedToday();
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+            }
+        }
+
+        function openModal() {
+            danceModal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+            startCamera();
+        }
+
+        function closeModal() {
+            danceModal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+            const stream = videoElement.srcObject;
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop()); // Stop the camera feed
+            }
+        }
+
+        function completeDance() {
+            if (dancedToday) return; // Do nothing if already danced today
+            
+            const today = new Date().toDateString();
+            
+            // Check if this is a consecutive day
+            if (lastDanceDate) {
+                const lastDate = new Date(lastDanceDate);
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (lastDate.toDateString() === yesterday.toDateString() || lastDanceDate === today) {
+                    // Consecutive day or same day
+                    streak++;
+                } else {
+                    // Streak broken
+                    streak = 1;
+                }
+            } else {
+                // First time dancing
+                streak = 1;
+            }
+            
+            // Update localStorage
+            localStorage.setItem('danceStreak', streak);
+            localStorage.setItem('lastDanceDate', today);
+            
+            // Update UI
+            dancedToday = true;
+            checkDancedToday();
+            
+            // Close the modal
+            closeModal();
+            
+            // You could add a celebration animation here
+            alert("Great job! Your dance streak is now " + streak + " day" + (streak !== 1 ? "s" : "") + "!");
+        }
+
+        surpriseBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        completeBtn.addEventListener('click', completeDance);
+
+        window.addEventListener('click', function(event) {
+            if (event.target === danceModal) {
+                closeModal();
+            }
+        });
+
+        // Initialize the page when loaded
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
