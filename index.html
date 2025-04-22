@@ -382,12 +382,12 @@
         const danceMoveTitle = document.querySelector('.dance-move-title');
         const danceDescription = document.getElementById('danceDescription');
 
-        // Initialize dance streak from localStorage
+        // Dance streak from localStorage
         let streak = localStorage.getItem('danceStreak') ? parseInt(localStorage.getItem('danceStreak')) : 0;
         let lastDanceDate = localStorage.getItem('lastDanceDate');
         let dancedToday = false;
 
-        // Dance GIFs categorized
+        // Dance GIFs 
         const danceGifs = {
             happy: [
                 {
@@ -500,7 +500,7 @@
             ]
         };
 
-        // Check if user has danced today
+        // Checks if user has danced today
         function checkDancedToday() {
             const today = new Date().toDateString();
             if (lastDanceDate === today) {
@@ -551,9 +551,9 @@
             });
         }
 
-        // Display the selected dance
+        // Displays the dance
         function displayDance(dance) {
-            // Set the GIF as the source of the image
+            // Sets the GIF as the source of the image
             gifImage.src = dance.url;
             gifImage.alt = dance.name + " dance move";
             
@@ -620,7 +620,7 @@
             // Close the modal
             closeModal();
             
-            // You could add a celebration animation here
+            // Celebration alert
             alert("Great job! Your dance streak is now " + streak + " day" + (streak !== 1 ? "s" : "") + "!");
         }
 
